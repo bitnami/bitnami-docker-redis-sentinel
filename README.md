@@ -139,6 +139,59 @@ Launch the containers using:
 $ docker-compose up -d
 ```
 
+### Using Master-Slave setups
+
+When using Sentinel in Master-Slave setup, if you want to set the passwords for Master and Slave nodes, consider having the <b>same</b> `REDIS_PASSWORD` and `REDIS_MASTER_PASSWORD` for them ([#23](https://github.com/bitnami/bitnami-docker-redis-sentinel/issues/23)).
+
+```yaml
+version: '2'
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=str0ng_passw0rd
+    networks:
+      - app-tier
+    ports:
+      - '6379'
+  redis-slave:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_REPLICATION_MODE=slave
+      - REDIS_MASTER_HOST=redis
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_PASSWORD=str0ng_passw0rd
+    ports:
+      - '6379'
+    depends_on:
+      - redis
+    networks:
+      - app-tier
+  redis-sentinel:
+    image: 'bitnami/redis-sentinel:latest'
+    environment:
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+    depends_on:
+      - redis
+      - redis-slave
+    ports:
+      - '26379-26381:26379'
+    networks:
+      - app-tier
+```
+
+Launch the containers using:
+
+```console
+$ docker-compose up --scale redis-sentinel=3 -d
+```
+
 # Configuration
 
 ## Environment variables
@@ -148,7 +201,7 @@ The Redis Sentinel instance can be customized by specifying environment variable
 - `REDIS_MASTER_HOST`: Host of the Redis master to monitor. Default: **redis**.
 - `REDIS_MASTER_PORT_NUMBER`: Port of the Redis master to monitor. Default: **6379**.
 - `REDIS_MASTER_SET`: Name of the set of Redis instances to monitor. Default: **mymaster**.
-- `REDIS_MASTER_PASSWORD`: Password to authenticate with the master. No defaults. As an alternative, you can mount a file with the password and set the `REDIS_MASTER_PASSWORD_FILE` variable. If replica is used, replica's `REDIS_PASSWORD` must be the same.
+- `REDIS_MASTER_PASSWORD`: Password to authenticate with the master. No defaults. As an alternative, you can mount a file with the password and set the `REDIS_MASTER_PASSWORD_FILE` variable.
 - `REDIS_SENTINEL_PORT_NUMBER`: Redis Sentinel port. Default: **26379**.
 - `REDIS_SENTINEL_QUORUM`: Number of Sentinels that need to agree about the fact the master is not reachable. Default: **2**.
 - `REDIS_SENTINEL_PASSWORD`: Password to authenticate with this sentinel and to authenticate to other sentinels. No defaults. Needs to be identical on all sentinels. As an alternative, you can mount a file with the password and set the `REDIS_SENTINEL_PASSWORD_FILE` variable.
