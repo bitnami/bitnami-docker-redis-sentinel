@@ -141,7 +141,7 @@ $ docker-compose up -d
 
 ### Using Master-Slave setups
 
-When using Sentinel in Master-Slave setup, if you want to set the passwords for Master and Slave nodes, consider having the <b>same</b> `REDIS_PASSWORD` and `REDIS_MASTER_PASSWORD` for them ([#23](https://github.com/bitnami/bitnami-docker-redis-sentinel/issues/23)).
+When using Sentinel in Master-Slave setup, if you want to set the passwords for Master and Slave nodes, consider having the **same** `REDIS_PASSWORD` and `REDIS_MASTER_PASSWORD` for them ([#23](https://github.com/bitnami/bitnami-docker-redis-sentinel/issues/23)).
 
 ```yaml
 version: '2'
