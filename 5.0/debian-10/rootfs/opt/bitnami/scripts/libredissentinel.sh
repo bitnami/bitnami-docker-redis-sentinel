@@ -176,25 +176,22 @@ redis_initialize() {
         [[ -z "$REDIS_MASTER_PASSWORD" ]] || redis_conf_set "sentinel auth-pass" "${REDIS_MASTER_SET} ${REDIS_MASTER_PASSWORD}"
         [[ -z "$REDIS_MASTER_USER" ]] || redis_conf_set "sentinel auth-user" "${REDIS_MASTER_SET} ${REDIS_MASTER_USER}"
 
+        # Sentinel Configuration (maybe overwritten by more specific init blocks like TLS configuration)
+        redis_conf_set port "$REDIS_SENTINEL_PORT_NUMBER"
+
         # TLS configuration
         if is_boolean_yes "$REDIS_SENTINEL_TLS_ENABLED"; then
-            if [[ "$REDIS_SENTINEL_PORT_NUMBER" ==  "26379" ]] && [[ "$REDIS_SENTINEL_TLS_PORT_NUMBER" ==  "26379" ]]; then
-                # If both ports are set to default values, enable TLS traffic only
+            if [[ "$REDIS_SENTINEL_PORT_NUMBER" == "$REDIS_SENTINEL_TLS_PORT_NUMBER" ]]; then
+                # If both ports are set to the same values, enable TLS traffic only
                 redis_conf_set port 0
-                redis_conf_set tls-port "$REDIS_SENTINEL_TLS_PORT_NUMBER"
-            else
-                # Different ports were specified
-                redis_conf_set port "$REDIS_SENTINEL_PORT_NUMBER"
-                redis_conf_set tls-port "$REDIS_SENTINEL_TLS_PORT_NUMBER"
             fi
+            redis_conf_set tls-port "$REDIS_SENTINEL_TLS_PORT_NUMBER"
             redis_conf_set tls-cert-file "$REDIS_SENTINEL_TLS_CERT_FILE"
             redis_conf_set tls-key-file "$REDIS_SENTINEL_TLS_KEY_FILE"
             redis_conf_set tls-ca-cert-file "$REDIS_SENTINEL_TLS_CA_FILE"
             [[ -n "$REDIS_SENTINEL_TLS_DH_PARAMS_FILE" ]] && redis_conf_set tls-dh-params-file "$REDIS_SENTINEL_TLS_DH_PARAMS_FILE"
             redis_conf_set tls-auth-clients "$REDIS_SENTINEL_TLS_AUTH_CLIENTS"
             redis_conf_set tls-replication yes
-        else
-            redis_conf_set port "$REDIS_SENTINEL_PORT_NUMBER"
         fi
 
         cp -pf "$REDIS_SENTINEL_CONF_FILE" "${REDIS_SENTINEL_VOLUME_DIR}/conf/sentinel.conf"
