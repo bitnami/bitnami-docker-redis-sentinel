@@ -193,6 +193,8 @@ redis_initialize() {
             [[ -n "$REDIS_SENTINEL_TLS_DH_PARAMS_FILE" ]] && redis_conf_set tls-dh-params-file "$REDIS_SENTINEL_TLS_DH_PARAMS_FILE"
             redis_conf_set tls-auth-clients "$REDIS_SENTINEL_TLS_AUTH_CLIENTS"
             redis_conf_set tls-replication yes
+        else
+            redis_conf_set port "$REDIS_SENTINEL_PORT_NUMBER"
         fi
 
         cp -pf "$REDIS_SENTINEL_CONF_FILE" "${REDIS_SENTINEL_VOLUME_DIR}/conf/sentinel.conf"
