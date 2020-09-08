@@ -215,6 +215,8 @@ The Redis Sentinel instance can be customized by specifying environment variable
 - `REDIS_SENTINEL_TLS_CA_FILE`: File containing the CA of the certificate. No defaults.
 - `REDIS_SENTINEL_TLS_DH_PARAMS_FILE`: File containing DH params (in order to support DH based ciphers). No defaults.
 - `REDIS_SENTINEL_TLS_AUTH_CLIENTS`: Whether to require clients to authenticate or not. Default: **yes**.
+- `REDIS_SENTINEL_ANNOUNCE_IP`: Use the specified IP address in the HELLO messages used to gossip its presence. Default: **auto-detected local address**.
+- `REDIS_SENTINEL_ANNOUNCE_PORT`: Use the specified port in the HELLO messages used to gossip its presence. Default: **port specified in `REDIS_SENTINEL_PORT_NUMBER`**.
 
 ## Securing Redis Sentinel traffic
 
