@@ -181,11 +181,15 @@ redis_initialize() {
 
         # TLS configuration
         if is_boolean_yes "$REDIS_SENTINEL_TLS_ENABLED"; then
-            if [[ "$REDIS_SENTINEL_PORT_NUMBER" == "$REDIS_SENTINEL_TLS_PORT_NUMBER" ]]; then
-                # If both ports are set to the same values, enable TLS traffic only
+            if [[ "$REDIS_SENTINEL_PORT_NUMBER" ==  "26379" ]] && [[ "$REDIS_SENTINEL_TLS_PORT_NUMBER" ==  "26379" ]]; then
+                # If both ports are set to default values, enable TLS traffic only
                 redis_conf_set port 0
+                redis_conf_set tls-port "$REDIS_SENTINEL_TLS_PORT_NUMBER"
+            else
+                # Different ports were specified
+                redis_conf_set port "$REDIS_SENTINEL_PORT_NUMBER"
+                redis_conf_set tls-port "$REDIS_SENTINEL_TLS_PORT_NUMBER"
             fi
-            redis_conf_set tls-port "$REDIS_SENTINEL_TLS_PORT_NUMBER"
             redis_conf_set tls-cert-file "$REDIS_SENTINEL_TLS_CERT_FILE"
             redis_conf_set tls-key-file "$REDIS_SENTINEL_TLS_KEY_FILE"
             redis_conf_set tls-ca-cert-file "$REDIS_SENTINEL_TLS_CA_FILE"
